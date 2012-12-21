@@ -1,0 +1,53 @@
+
+%form#sign_in
+  = label :user, :email, "Email"
+  = text_field :user, :email
+  = label :user, :password
+  = password_field :user, :password
+  = link_to "Sign in", "#", :remote => true, :onclick => "login()"
+
+:javascript
+  var token;
+  function login() {
+    var email = $('#user_email').val();
+    var password = $('#user_password').val();
+    var data = { remote: true, password: password, email: email };
+    $.post('http://localhost:3000/api/tokens.json', data, function(resp) {
+      if(resp.success) {
+        token = resp['token']
+
+        $('.alert').html("");
+
+        $('.notice').append('<p>Logged in</p>');
+        $('.notice').append('<a href="http://localhost:3000/companies.json?auth_token=' + token + '">Companies</a>');
+        $('.notice').append('<a href="#" onclick="logout()">Sign out</a>');
+
+        $("#sign_in").hide();
+      } else {
+        $('.alert').append("<p>can not login</p>");
+      }
+    }).error(function() { 
+      $('.alert').append("<p>An error occur, please try again</p>");
+    });
+    return false;
+  }
+
+  function logout() {
+    var data = { remote: true, _method: 'delete', authenticity_token: token };
+    $.post('http://localhost:3000/api/tokens/' + token + '.json',
+      data,
+      function(resp) {
+        if (resp.success) {
+          token = '';
+          $('.alert').html("");
+          $('.notice').html('<p>Logged Out</p>');
+          $("#sign_in").show();
+        } else {
+          $('.alert').append("<p>can not logout</p>");
+        }
+    }).error(function() { 
+      $('.alert').append("<p>An error occur, please try again</p>");
+    });
+    return false
+  }
+
