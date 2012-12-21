@@ -8,6 +8,7 @@
 
 :javascript
   var token;
+  var remote_host = "http://localhost:3000"
 
   function request_error() {
     $('.alert').append("<p>An error occur, please try again</p>");
@@ -22,7 +23,7 @@
   function logged_in() {
     $('.alert').html("");
     $('.notice').append('<p>Logged in</p>');
-    $('.notice').append('<a href="http://localhost:3000/companies.json?auth_token=' + token + '">Companies</a>');
+    $('.notice').append('<a href="' + remote_host + '/companies.json?auth_token=' + token + '">Companies</a>');
     $('.notice').append('<a href="#" onclick="logout()">Sign out</a>');
 
     $("#sign_in").hide();
@@ -44,7 +45,7 @@
     var email = $('#user_email').val();
     var password = $('#user_password').val();
     var data = { remote: true, password: password, email: email };
-    $.post('http://localhost:3000/api/tokens.json', data, function(resp) {
+    $.post(remote_host + '/api/tokens.json', data, function(resp) {
       if(resp.success) {
         token = resp['token'];
         logged_in();
@@ -57,7 +58,7 @@
 
   function logout() {
     var data = { remote: true, _method: 'delete', authenticity_token: token };
-    $.post('http://localhost:3000/api/tokens/' + token + '.json',
+    $.post(remote_host + '/api/tokens/' + token + '.json',
       data,
       function(resp) {
         if (resp.success) {
