@@ -13,8 +13,10 @@
     $('.alert').append("<p>An error occur, please try again</p>");
   }
 
-  function logged_in_failed() {
-    $('.alert').append("<p>can not login</p>");
+  function logged_in_failed(msg) {
+    $('.notice').html("");
+    $("#sign_in").show();
+    $('.alert').append('<p>can not login: ' + msg + '</p>');
   }
 
   function logged_in() {
@@ -47,7 +49,7 @@
         token = resp['token'];
         logged_in();
       } else {
-        logged_in_failed();
+        logged_in_failed(resp.message);
       }
     }).error( request_error() );
     return false;
