@@ -8,27 +8,48 @@
 
 :javascript
   var token;
+
+  function request_error() {
+    $('.alert').append("<p>An error occur, please try again</p>");
+  }
+
+  function logged_in_failed() {
+    $('.alert').append("<p>can not login</p>");
+  }
+
+  function logged_in() {
+    $('.alert').html("");
+    $('.notice').append('<p>Logged in</p>');
+    $('.notice').append('<a href="http://localhost:3000/companies.json?auth_token=' + token + '">Companies</a>');
+    $('.notice').append('<a href="#" onclick="logout()">Sign out</a>');
+
+    $("#sign_in").hide();
+  }
+
+
+  function logged_out() {
+    $('.alert').html("");
+    $('.notice').html('<p>Logged Out</p>');
+    $("#sign_in").show();
+  }
+
+
+  function logged_out_failed() {
+    $('.alert').append("<p>can not logout</p>");
+  }
+
   function login() {
     var email = $('#user_email').val();
     var password = $('#user_password').val();
     var data = { remote: true, password: password, email: email };
     $.post('http://localhost:3000/api/tokens.json', data, function(resp) {
       if(resp.success) {
-        token = resp['token']
-
-        $('.alert').html("");
-
-        $('.notice').append('<p>Logged in</p>');
-        $('.notice').append('<a href="http://localhost:3000/companies.json?auth_token=' + token + '">Companies</a>');
-        $('.notice').append('<a href="#" onclick="logout()">Sign out</a>');
-
-        $("#sign_in").hide();
+        token = resp['token'];
+        logged_in();
       } else {
-        $('.alert').append("<p>can not login</p>");
+        logged_in_failed();
       }
-    }).error(function() { 
-      $('.alert').append("<p>An error occur, please try again</p>");
-    });
+    }).error( request_error() );
     return false;
   }
 
@@ -39,15 +60,11 @@
       function(resp) {
         if (resp.success) {
           token = '';
-          $('.alert').html("");
-          $('.notice').html('<p>Logged Out</p>');
-          $("#sign_in").show();
+          logged_out();
         } else {
-          $('.alert').append("<p>can not logout</p>");
+          logged_out_failed();
         }
-    }).error(function() { 
-      $('.alert').append("<p>An error occur, please try again</p>");
-    });
+    }).error( request_error() );
     return false
   }
 
